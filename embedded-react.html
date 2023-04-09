@@ -1,0 +1,65 @@
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"
+  integrity="sha512-8Q6Y9XnTbOE+JNvjBQwJ2H8S+UV4uA6hiRykhdtIyDYZ2TprdNmWOUaKdGzOhyr4dCyk287OejbPvwl7lrfqrQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"
+  integrity="sha512-MOCpqoRoisCTwJ8vQQiciZv0qcpROCidek3GTFS6KTk2+y7munJIlKCVkFCYY+p3ErYFXCjmFjnfTTRSC1OHWQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script src="https://unpkg.com/@babel/standalone@7.21.4/babel.min.js"></script>
+
+<div id="feedback_root"></div>
+
+<script type="text/babel">
+  let root = ReactDOM.createRoot(document.getElementById("feedback_root"));
+  let ThumbsUp = () => {
+    const [test, setTest] = React.useState("Click ME!");
+
+    function submit() {
+      fetch("https://http-intake.logs.datadoghq.com/api/v2/logs", {
+        method: "POST",
+        headers: {
+          "DD-API-KEY": "YOUR_DD_API_KEY"
+        },
+        body: JSON.stringify([
+          {
+            ddsource: "nginx",
+            ddtags: "env:staging,version:5.1",
+            hostname: "i-012345678",
+            message:
+              "2019-11-19T14:37:58,995 INFO [process.name][20081] Hello World",
+            service: "payment"
+          }
+        ])
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("DATA", data);
+        });
+    }
+    return (
+      <div>
+        <button
+          onClick={() => {
+            submit();
+          }}
+        >
+          {test}
+        </button>
+      </div>
+    );
+  };
+  let component = (
+    <div>
+      <ThumbsUp />
+    </div>
+  );
+
+  root.render(component, () => {
+    console.log("Callback");
+  });
+</script>
